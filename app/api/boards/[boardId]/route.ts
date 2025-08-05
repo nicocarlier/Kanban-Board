@@ -36,13 +36,22 @@ export async function GET(
       WHERE board_id = ? AND is_deleted = 0
       ORDER BY column_id, order_index
     `);
-    const cards = cardsStmt.all(boardId);
+    const cards = cardsStmt.all(boardId) as Array<{
+      id: string;
+      title: string;
+      description: string;
+      is_deleted: number;
+      created_at: string;
+      updated_at: string;
+      column_id: string;
+      board_id: string;
+    }>;
 
     // Group cards by column
     const boardColumns = columns.map(column => ({
       title: column.title,
       index: column.index,
-      cards: cards.filter((card: any) => card.column_id === column.id)
+      cards: cards.filter((card) => card.column_id === column.id)
     }));
 
     return NextResponse.json({

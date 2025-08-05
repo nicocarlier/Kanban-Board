@@ -1,8 +1,8 @@
-import { BoardColumns } from '@/app/page';
+import { Kanban } from "@/types/board.interface";
 
 const API_BASE = '/api';
 
-export async function fetchBoard(boardId: string): Promise<Board> {
+export async function fetchBoard(boardId: string): Promise<Kanban.Board> {
   const response = await fetch(`${API_BASE}/boards/${boardId}`);
   
   if (!response.ok) {
@@ -12,7 +12,7 @@ export async function fetchBoard(boardId: string): Promise<Board> {
   return response.json();
 }
 
-export async function fetchColumn(boardId: string, columnId: string): Promise<BoardColumns> {
+export async function fetchColumn(boardId: string, columnId: string): Promise<Kanban.Column> {
   const response = await fetch(`${API_BASE}/boards/${boardId}/columns/${columnId}`);
   
   if (!response.ok) {

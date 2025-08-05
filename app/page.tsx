@@ -1,109 +1,13 @@
 "use client";
 
 import Column from "@/components/column";
-import Image from "next/image";
-import { fetchBoard, fetchColumn, DEFAULT_BOARD_ID, COLUMN_IDS } from "@/lib/api";
+import { fetchBoard, DEFAULT_BOARD_ID } from "@/lib/api";
 import { useEffect, useState } from "react";
-
-interface Card {
-  id: string;
-  title: string;
-  description: string;
-  is_deleted: boolean;
-  created_at: string;
-  updated_at: string;
-  column_id: number;
-  board_id: number;
-}
-
-export interface BoardColumn {
-  cards: Card[];
-  title: string;
-  index: number;
-}
-
-interface Board {
-  name: string;
-  columns: Array<BoardColumn>
-}
-
-// Example board data
-const exampleBoard: Board = {
-  name: "Project Kanban Board",
-  columns: [
-    {
-      title: "To Do",
-      index: 0,
-      cards: [
-        {
-          id: "card_1",
-          title: "Design user interface",
-          description: "Create wireframes and mockups for the new feature",
-          is_deleted: false,
-          created_at: "2024-01-15T10:00:00Z",
-          updated_at: "2024-01-15T10:00:00Z",
-          column_id: 0,
-          board_id: 1
-        },
-        {
-          id: "card_2", 
-          title: "Set up database schema",
-          description: "Define tables and relationships for the project",
-          is_deleted: false,
-          created_at: "2024-01-15T11:30:00Z",
-          updated_at: "2024-01-15T11:30:00Z",
-          column_id: 0,
-          board_id: 1
-        }
-      ]
-    },
-    {
-      title: "In Progress",
-      index: 1,
-      cards: [
-        {
-          id: "card_3",
-          title: "Implement authentication",
-          description: "Add user login and registration functionality",
-          is_deleted: false,
-          created_at: "2024-01-14T09:00:00Z",
-          updated_at: "2024-01-16T14:20:00Z",
-          column_id: 1,
-          board_id: 1
-        }
-      ]
-    },
-    {
-      title: "Done",
-      index: 2,
-      cards: [
-        {
-          id: "card_4",
-          title: "Project setup",
-          description: "Initialize Next.js project with TypeScript and Tailwind",
-          is_deleted: false,
-          created_at: "2024-01-13T08:00:00Z",
-          updated_at: "2024-01-13T16:00:00Z",
-          column_id: 2,
-          board_id: 1
-        },
-        {
-          id: "card_5",
-          title: "Requirements gathering",
-          description: "Document all project requirements and user stories",
-          is_deleted: false,
-          created_at: "2024-01-12T10:00:00Z",
-          updated_at: "2024-01-12T15:30:00Z",
-          column_id: 2,
-          board_id: 1
-        }
-      ]
-    }
-  ]
-};
+import { Kanban } from "@/types/board.interface";
+import { exampleBoard } from "@/const/exampleData";
 
 export default function Home() {
-  const [board, setBoard] = useState<Board | null>(null);
+  const [board, setBoard] = useState<Kanban.Board | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -143,10 +47,10 @@ export default function Home() {
   }
 
   return (
-    <div className="w-full h-full">
+    <div className="w-full h-full flex flex-col gap-4">
 
-      <div className="flex w-full items-center justify-between mb-4">
-        <h1 className="text-2xl font-bold">Database Connected Kanban Board</h1>
+      <div className="flex w-full items-center justify-between ">
+        <h1 className="text-2xl font-bold text-white">Database Connected Kanban Board</h1>
         <button onClick={toggleDisplay} className="bg-blue-500">
           {display === "db" ? "Switch to example board" : "Switch to db connected"}
         </button>
@@ -155,7 +59,7 @@ export default function Home() {
       {/* Show the fetched board */}
       {display === "db" && board && (
         <div className="flex gap-4 h-full w-full">
-          {board.columns.map((col: BoardColumn, i: number) => (
+          {board.columns.map((col: Kanban.Column, i: number) => (
             <div className="h-full flex-1 min-w-0" key={i}>
               <Column col={col}/>
             </div>
@@ -166,7 +70,7 @@ export default function Home() {
       {/* Show example board for comparison */}
       {display === "example" && (
         <div className="flex gap-4 h-full w-full">
-          {exampleBoard.columns.map((col: BoardColumn, i: number) => (
+          {exampleBoard.columns.map((col: Kanban.Column, i: number) => (
             <div className="h-full flex-1 min-w-0" key={i}>
               <Column col={col}/>
             </div>
