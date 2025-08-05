@@ -1,71 +1,209 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Kanban Board - TaskFlow Solutions
 
-## Getting Started
+A full-stack Kanban board application built for managing tasks across different project stages. This project demonstrates a robust single-user experience with persistent data storage and real-time state management.
 
-First, run the development server:
+## 🎯 Project Overview
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+This Kanban board allows users to:
+- **View tasks** organized across customizable columns (To Do, In Progress, Done)
+- **Add new cards** to any column with titles and descriptions
+- **Drag and drop** cards between columns to update task status
+- **Edit card details** including titles and descriptions
+- **Delete cards** when tasks are no longer needed
+- **Persistent storage** - all changes are saved to the database and restored on page refresh
+
+## 🏗️ Technical Architecture
+
+### Framework Choice: Next.js 15
+**Why Next.js?**
+- **Type Safety**: Strong TypeScript integration ensures type contracts between frontend and API
+- **API Routes**: Built-in API routes eliminate need for separate backend server
+- **Full-Stack**: Single codebase for both frontend and backend logic
+- **Performance**: Server-side rendering and optimized builds
+- **Developer Experience**: Hot reloading, excellent debugging tools
+
+### Database Choice: SQLite with better-sqlite3
+**Why SQLite for a Kanban board?**
+- **Relational Schema**: Perfect fit for consistent board/column/card relationships
+- **ACID Compliance**: Ensures data integrity for task operations
+- **Zero Configuration**: No separate database server needed
+- **File-based**: Database file can be easily backed up or version controlled
+- **Performance**: Excellent for single-user applications with fast read/write operations
+
+### Schema Design
+```sql
+-- Boards table for project organization
+CREATE TABLE boards (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Columns table for task stages
+CREATE TABLE columns (
+  id TEXT PRIMARY KEY,
+  board_id TEXT NOT NULL,
+  name TEXT NOT NULL,
+  order_index INTEGER NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (board_id) REFERENCES boards (id)
+);
+
+-- Cards table for individual tasks
+CREATE TABLE cards (
+  id TEXT PRIMARY KEY,
+  board_id TEXT NOT NULL,
+  column_id TEXT NOT NULL,
+  title TEXT NOT NULL,
+  description TEXT,
+  is_deleted INTEGER DEFAULT 0,
+  order_index INTEGER NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (board_id) REFERENCES boards (id),
+  FOREIGN KEY (column_id) REFERENCES columns (id)
+);
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🚀 Getting Started
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Prerequisites
+- Node.js 18+ 
+- npm or yarn
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Installation
 
-## Learn More
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd Kanban-Board
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+3. **Start the development server**
+   ```bash
+   npm run dev
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+4. **Open your browser**
+   Navigate to [http://localhost:3000](http://localhost:3000) (or the port shown in terminal)
 
-## Deploy on Vercel
+### Database Setup
+The application automatically:
+- Creates the SQLite database file (`kanban.db`) on first run
+- Initializes the default board with three columns (To Do, In Progress, Done)
+- Sets up all necessary tables and relationships
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 📡 API Endpoints
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Core Endpoints
+- `GET /api/boards/:boardId` - Retrieve board with all columns and cards
+- `POST /api/boards/:boardId/cards` - Add a new card to a column
+- `PUT /api/boards/:boardId/cards/:cardId` - Update card details
+- `PUT /api/boards/:boardId/cards/:cardId/move` - Move card between columns
+- `DELETE /api/boards/:boardId/cards/:cardId` - Delete a card
 
+### Example Usage
+```javascript
+// Fetch board data
+const board = await fetch('/api/boards/default-board').then(r => r.json());
 
-Instructions
-Story Context: You’re a lead engineer at “TaskFlow Solutions,” a startup building collaboration tools. Your current task is to build the core architecture for a functional Kanban board. The initial requirement is to allow users to manage tasks across different stages (columns) on a project board, with all changes persisting to a database. While real-time updates are a future feature, for now, focus on a robust single-user experience where changes are saved and loaded correctly.
+// Add a new card
+await fetch('/api/boards/default-board/cards', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    title: 'New Task',
+    description: 'Task description',
+    columnId: 'todo'
+  })
+});
+```
 
-Problem Statement: Design and implement a full-stack Kanban board application. The application should allow a user to manage tasks across different stages (columns) in a project (board). All changes (adding tasks, moving tasks, deleting tasks, editing tasks) must be persisted in a database.
+## 🎨 Features
 
-Technical Requirements:
+### Current Implementation
+- ✅ **Database Integration**: Full SQLite integration with automatic schema creation
+- ✅ **Board Display**: View tasks organized across columns
+- ✅ **Data Persistence**: All changes saved to database
+- ✅ **Error Handling**: Graceful error handling and loading states
+- ✅ **Type Safety**: Full TypeScript implementation
 
-Frontend:
+### Planned Features
+- 🔄 **Card Management**: Add, edit, delete cards
+- 🎯 **Drag & Drop**: Move cards between columns
+- 📱 **Responsive Design**: Mobile-friendly interface
+- 🔄 **Real-time Updates**: WebSocket integration for multi-user support
 
-Display a single Kanban board with multiple customizable columns (e.g., “To Do”, “In Progress”, “Done”).
-Each column should contain multiple draggable task “cards”.
-Users must be able to:
-Add new cards to a column (e.g., via an input field/button).
-Drag and drop cards between columns.
-Edit card titles/descriptions.
-Delete cards.
-Changes made by the user must be persisted to the backend/database. When the page is refreshed, the board should load its last saved state.
-Backend:
+## 🛠️ Development
 
-Implement a RESTful API for managing boards, columns, and cards.
-The backend must persist board, column, and card data in a database (e.g., MongoDB, PostgreSQL, SQLite).
-API Endpoints (minimum):
-GET /boards/:boardId - Retrieve a specific board’s data, including its columns and their respective cards.
-POST /boards/:boardId/cards - Add a new card to a specified column on a board.
-PUT /boards/:boardId/cards/:cardId/move - Update a card’s column and/or its order within a column.
-PUT /boards/:boardId/cards/:cardId - Update card details (e.g., title, description).
-DELETE /boards/:boardId/cards/:cardId - Delete a card.
-Constraints/Assumptions:
+### Project Structure
+```
+├── app/
+│   ├── api/                    # API routes
+│   │   └── boards/
+│   │       └── [boardId]/
+│   │           ├── route.ts    # GET board
+│   │           └── cards/      # Card operations
+│   ├── globals.css             # Global styles
+│   ├── layout.tsx              # Root layout
+│   └── page.tsx                # Main board page
+├── components/
+│   └── column.tsx              # Column component
+├── lib/
+│   ├── api.ts                  # API client functions
+│   ├── db.ts                   # Database setup
+│   └── models/                 # TypeScript models
+└── public/                     # Static assets
+```
 
-Assume a single hardcoded board ID for simplicity; no need for multi-board selection or user authentication.
-Focus on core functionality and data persistence. Real-time synchronization between multiple clients is out of scope for the implementation task but will be discussed later.
-Basic error handling is expected (e.g., checking for invalid IDs).
-Prioritize a working end-to-end flow over extensive styling.
+### Key Technologies
+- **Frontend**: Next.js 15, React 18, TypeScript
+- **Styling**: Tailwind CSS
+- **Database**: SQLite with better-sqlite3
+- **API**: Next.js API Routes
+- **Development**: ESLint, PostCSS
+
+## 🧪 Testing
+
+### Manual Testing Checklist
+- [ ] Board loads with default columns
+- [ ] Database connection works
+- [ ] API endpoints respond correctly
+- [ ] Error states display properly
+- [ ] Page refresh restores state
+
+## 📝 Development Notes
+
+### Design Decisions
+1. **Single Board Focus**: Simplified to one hardcoded board for MVP
+2. **File-based Database**: SQLite provides persistence without infrastructure complexity
+3. **TypeScript First**: Ensures type safety across the entire stack
+4. **API-First Design**: Clean separation between frontend and data layer
+
+### Future Enhancements
+- Multi-board support
+- User authentication
+- Real-time collaboration
+- Advanced filtering and search
+- Card attachments and comments
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+---
+
+**Built with ❤️ by TaskFlow Solutions**
