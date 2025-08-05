@@ -47,10 +47,10 @@ export default function Home() {
   }
 
   return (
-    <div className="w-full h-full flex flex-col gap-4">
+    <div className="w-full h-full flex flex-col ">
 
-      <div className="flex w-full items-center justify-between ">
-        <h1 className="text-2xl font-bold text-white">Database Connected Kanban Board</h1>
+      <div className="flex w-full items-center justify-between px-4 pb-4 border-b border-b-gray-400">
+        <h1 className="text-2xl font-bold text-gray-700">Database Connected Kanban Board</h1>
         <button onClick={toggleDisplay} className="bg-blue-500">
           {display === "db" ? "Switch to example board" : "Switch to db connected"}
         </button>
@@ -58,7 +58,7 @@ export default function Home() {
       
       {/* Show the fetched board */}
       {display === "db" && board && (
-        <div className="flex gap-4 h-full w-full">
+        <div className="flex h-full w-full">
           {board.columns.map((col: Kanban.Column, i: number) => (
             <div className="h-full flex-1 min-w-0" key={i}>
               <Column col={col}/>
@@ -69,7 +69,7 @@ export default function Home() {
 
       {/* Show example board for comparison */}
       {display === "example" && (
-        <div className="flex gap-4 h-full w-full">
+        <div className="flex h-full w-full">
           {exampleBoard.columns.map((col: Kanban.Column, i: number) => (
             <div className="h-full flex-1 min-w-0" key={i}>
               <Column col={col}/>

@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@fluentui/react-icons": "^2.0.307",
     "better-sqlite3": "^12.2.0",
     "next": "15.4.5",
     "react": "19.1.0",
