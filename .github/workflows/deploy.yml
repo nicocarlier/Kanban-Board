@@ -2,9 +2,9 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [ main ]
+    branches: [ local-storage-app ]
   pull_request:
-    branches: [ main ]
+    branches: [ local-storage-app ]
 
 permissions:
   contents: write
@@ -36,7 +36,7 @@ jobs:
       
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/local-storage-app'
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./out 
