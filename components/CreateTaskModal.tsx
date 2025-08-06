@@ -7,7 +7,6 @@ import {
     ModalBody,
     ModalFooter,
     Button,
-    Input,
 } from "@heroui/react";
 import { UseDisclosureProps } from "@/types/general.interface";
 import { Kanban } from "@/types/board.interface";

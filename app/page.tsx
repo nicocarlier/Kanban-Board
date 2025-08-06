@@ -10,7 +10,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [display, setDisplay] = useState<"example" | "db">("db")
+
 
   useEffect(() => {
     function loadBoard() {
@@ -41,9 +41,7 @@ export default function Home() {
     </div>;
   }
 
-  const toggleDisplay = () => {
-    setDisplay(prev => prev === "db" ? "example" : "db");
-  }
+
 
   return (
     <div className="w-full h-full flex flex-col ">
