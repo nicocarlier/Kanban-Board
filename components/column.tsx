@@ -3,6 +3,7 @@ import { Add20Filled } from "@fluentui/react-icons";
 import CreateTaskModal from "./CreateTaskModal";
 import TaskCard from "./TaskCard";
 import {  useDisclosure } from "@heroui/react";
+import { updateCard, deleteCard } from "@/lib/storage";
 
 interface ColumnProps {
     col: Kanban.Column;
@@ -16,33 +17,9 @@ export default function Column({col, board, setBoard}: ColumnProps){
 
     const handleEditCard = async (cardId: string, title: string, description: string) => {
         try {
-            const response = await fetch(`/api/boards/default-board/cards/${cardId}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ title, description }),
-            });
-
-            if (response.ok) {
-                // Update the board state
-                setBoard(prev => {
-                    if (!prev) return prev;
-                    return {
-                        ...prev,
-                        columns: prev.columns.map(column => ({
-                            ...column,
-                            cards: column.cards.map(card => 
-                                card.id === cardId 
-                                    ? { ...card, title, description }
-                                    : card
-                            )
-                        }))
-                    };
-                });
-            } else {
-                console.error('Failed to update card');
-            }
+            // Use localStorage instead of API
+            const updatedBoard = updateCard(board, cardId, title, description);
+            setBoard(updatedBoard);
         } catch (error) {
             console.error('Error updating card:', error);
         }
@@ -50,25 +27,9 @@ export default function Column({col, board, setBoard}: ColumnProps){
 
     const handleDeleteCard = async (cardId: string) => {
         try {
-            const response = await fetch(`/api/boards/default-board/cards/${cardId}`, {
-                method: 'DELETE',
-            });
-
-            if (response.ok) {
-                // Update the board state
-                setBoard(prev => {
-                    if (!prev) return prev;
-                    return {
-                        ...prev,
-                        columns: prev.columns.map(column => ({
-                            ...column,
-                            cards: column.cards.filter(card => card.id !== cardId)
-                        }))
-                    };
-                });
-            } else {
-                console.error('Failed to delete card');
-            }
+            // Use localStorage instead of API
+            const updatedBoard = deleteCard(board, cardId);
+            setBoard(updatedBoard);
         } catch (error) {
             console.error('Error deleting card:', error);
         }
@@ -109,6 +70,7 @@ export default function Column({col, board, setBoard}: ColumnProps){
                 modalProps={taskModalProps} 
                 colIndex={col.index}
                 columnName={col.title}
+                board={board}
                 setBoard={setBoard}
             />
         </>

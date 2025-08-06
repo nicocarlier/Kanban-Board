@@ -11,11 +11,13 @@ import {
 } from "@heroui/react";
 import { UseDisclosureProps } from "@/types/general.interface";
 import { Kanban } from "@/types/board.interface";
+import { addCard } from "@/lib/storage";
 
 interface CreateTaskModalProps {
     modalProps: UseDisclosureProps;
     colIndex: number;
     columnName: string;
+    board: Kanban.Board;
     setBoard: React.Dispatch<React.SetStateAction<Kanban.Board | null>>;
 }
 
@@ -23,6 +25,7 @@ export default function CreateTaskModal({
     modalProps,
     colIndex,
     columnName,
+    board,
     setBoard,
 } : CreateTaskModalProps) {
 
@@ -35,44 +38,12 @@ export default function CreateTaskModal({
         
         setIsLoading(true);
         try {
-            const response = await fetch('/api/boards/default-board/cards', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    title: taskTitle,
-                    description: taskDescription,
-                    columnId: colIndex === 0 ? 'todo' : colIndex === 1 ? 'in-progress' : 'done'
-                }),
-            });
-
-            if (response.ok) {
-                const newCard: Kanban.Card = await response.json();
-                setTaskTitle("");
-                setTaskDescription("");
-                modalProps.onClose();
-
-                // Update the board state
-                setBoard(prev => {
-                    if (!prev) return prev;
-                    const updatedBoard: Kanban.Board = {
-                        ...prev,
-                        columns: prev.columns.map((col, index) => {
-                            if (index === colIndex) {
-                                return {
-                                    ...col,
-                                    cards: [...col.cards, newCard]
-                                }
-                            }
-                            return col;
-                        })
-                    }
-                    return updatedBoard;
-                })
-            } else {
-                console.error('Failed to create task');
-            }
+            // Use localStorage instead of API
+            const updatedBoard = addCard(board, colIndex, taskTitle.trim(), taskDescription.trim());
+            setTaskTitle("");
+            setTaskDescription("");
+            modalProps.onClose();
+            setBoard(updatedBoard);
         } catch (error) {
             console.error('Error creating task:', error);
         } finally {
