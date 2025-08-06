@@ -58,17 +58,17 @@ export default function Home() {
       
       {/* Show the fetched board */}
       {display === "db" && board && (
-        <div className="flex h-full w-full">
+        <div className="flex h-full w-full border border-gray-400">
           {board.columns.map((col: Kanban.Column, i: number) => (
-            <div className="h-full flex-1 min-w-0" key={i}>
-              <Column col={col}/>
+            <div className="h-full flex-1 min-w-0 border-r border-gray-400 last:!border-r-0" key={i}>
+              <Column col={col} board={board} setBoard={setBoard}/>
             </div>
           ))}
         </div>
       )}
 
       {/* Show example board for comparison */}
-      {display === "example" && (
+      {/* {display === "example" && (
         <div className="flex h-full w-full">
           {exampleBoard.columns.map((col: Kanban.Column, i: number) => (
             <div className="h-full flex-1 min-w-0" key={i}>
@@ -76,7 +76,7 @@ export default function Home() {
             </div>
           ))}
         </div>
-      )}
+      )} */}
     </div>
   );
 }
