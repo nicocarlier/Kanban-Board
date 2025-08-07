@@ -31,9 +31,7 @@ export default function Column({ col, setBoard, onEditCard, onDeleteCard }: Colu
                     <p className="text-lg">{col.title}</p>
                     <p className="text-sm text-gray-700">{`${col.cards.length} Tasks`}</p>
                     <button 
-                        onClick={() => {
-                            taskModalProps.onOpen();
-                        }}
+                        onClick={taskModalProps.onOpen}
                         className="mt-4 w-full !h-10 !min-h-10 flex items-center justify-center bg-white border border-gray-300 rounded-md hover:cursor-pointer"
                     >
                         <Add20Filled className="text-gray-700"/>

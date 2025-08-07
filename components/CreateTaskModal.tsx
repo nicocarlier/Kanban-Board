@@ -82,18 +82,19 @@ export default function CreateTaskModal({
     return (
         <Modal 
             isOpen={modalProps.isOpen} 
+            // isOpen={true}
             onOpenChange={modalProps.onOpenChange}
             placement="center"
             backdrop="opaque"
             size="lg"
             classNames={{
-                wrapper: "",
-                base: "max-w-2xl",
+                wrapper: "!z-50",
+                base: "max-w-2xl !z-51",
                 backdrop: "!bg-[rgba(0,0,0,0.5)]"
             }}
             hideCloseButton={true}
         >
-            <ModalContent className="z-50 !bg-white rounded-lg p-6 relative">
+            <ModalContent className="!z-52 !bg-white rounded-lg p-6 relative">
             {(onClose) => (
                 <>
                     <ModalHeader className="flex flex-col gap-1 pb-4">

@@ -21,10 +21,15 @@ Backend:
 Implement a RESTful API for managing boards, columns, and cards.
 The backend must persist board, column, and card data in a database (e.g., MongoDB, PostgreSQL, SQLite).
 API Endpoints (minimum):
+
 GET /boards/:boardId - Retrieve a specific board’s data, including its columns and their respective cards.
+
 POST /boards/:boardId/cards - Add a new card to a specified column on a board.
+
 PUT /boards/:boardId/cards/:cardId/move - Update a card’s column and/or its order within a column.
+
 PUT /boards/:boardId/cards/:cardId - Update card details (e.g., title, description).
+
 DELETE /boards/:boardId/cards/:cardId - Delete a card.
 Constraints/Assumptions:
 
