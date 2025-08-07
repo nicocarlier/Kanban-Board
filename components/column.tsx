@@ -24,6 +24,8 @@ export default function Column({ col, setBoard, onEditCard, onDeleteCard }: Colu
     // Get card IDs for sortable context
     const cardIds = col.cards.map(card => card.id);
 
+    console.log('Column render - taskModalProps:', taskModalProps, 'col.title:', col.title);
+
     return (
         <>
             <div className={`w-full h-full bg-gray-100 transition-colors ${isOver ? '!bg-blue-100' : ''}`}>
@@ -31,7 +33,11 @@ export default function Column({ col, setBoard, onEditCard, onDeleteCard }: Colu
                     <p className="text-lg">{col.title}</p>
                     <p className="text-sm text-gray-700">{`${col.cards.length} Tasks`}</p>
                     <button 
-                        onClick={taskModalProps.onOpen}
+                        onClick={() => {
+                            console.log("Button clicked - opening modal for column:", col.title);
+                            taskModalProps.onOpen();
+                            console.log("Modal props after onOpen:", taskModalProps);
+                        }}
                         className="mt-4 w-full !h-10 !min-h-10 flex items-center justify-center bg-white border border-gray-300 rounded-md hover:cursor-pointer"
                     >
                         <Add20Filled className="text-gray-700"/>

@@ -1,6 +1,5 @@
 "use client";
 
-import Column from "@/components/column";
 import { fetchBoard, DEFAULT_BOARD_ID, updateCardPosition, moveCardBetweenColumns, handleEditCard as apiHandleEditCard, handleDeleteCard as apiHandleDeleteCard } from "@/lib/api";
 import { useEffect, useState } from "react";
 import { Kanban } from "@/types/board.interface";
@@ -18,6 +17,7 @@ import {
 import { arrayMove } from "@dnd-kit/sortable";
 import TaskCard from "@/components/TaskCard";
 import { Spinner } from "@heroui/react";
+import Column from "@/components/Column";
 
 export default function Home() {
   const [board, setBoard] = useState<Kanban.Board | null>(null);
@@ -263,7 +263,7 @@ export default function Home() {
   return (
     <div className="w-full h-full flex flex-col">
       <div className="flex w-full items-center justify-between px-4 pb-4 border-b border-b-gray-400">
-        <h1 className="text-2xl font-bold text-gray-700">Database Connected Kanban Board</h1>
+        <h1 className="text-2xl font-bold text-gray-700">Kanban Board</h1>
       </div>
       
       {board && (
@@ -277,7 +277,7 @@ export default function Home() {
           <div className="flex h-full w-full border border-gray-400">
             {board.columns.map((col: Kanban.Column, i: number) => (
               <div className="h-full flex-1 min-w-0 border-r border-gray-400 last:!border-r-0" key={i}>
-                <Column 
+                <Column
                   col={col} 
                   setBoard={setBoard}
                   onEditCard={handleEditCard}
