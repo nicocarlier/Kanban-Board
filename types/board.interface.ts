@@ -12,6 +12,7 @@ export namespace Kanban {
     }
 
     export interface Column {
+        id: string;
         cards: Card[];
         title: string;
         index: number;

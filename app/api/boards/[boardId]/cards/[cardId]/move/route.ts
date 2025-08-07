@@ -7,7 +7,7 @@ export async function PUT(
 ) {
   try {
     const { boardId, cardId } = await params;
-    const { columnId, orderIndex } = await request.json();
+    const { columnId, newIndex } = await request.json();
 
     // Validate input
     if (!columnId) {
@@ -20,7 +20,7 @@ export async function PUT(
       return NextResponse.json({ error: 'Card not found' }, { status: 404 });
     }
 
-    // Check if target column exists
+    // Check if column exists
     const columnExists = db.prepare('SELECT id FROM columns WHERE id = ? AND board_id = ?').get(columnId, boardId);
     if (!columnExists) {
       return NextResponse.json({ error: 'Column not found' }, { status: 404 });
@@ -29,17 +29,23 @@ export async function PUT(
     // Update card's column and order
     const updateCard = db.prepare(`
       UPDATE cards 
-      SET column_id = ?, order_index = ?, updated_at = CURRENT_TIMESTAMP 
+      SET column_id = ?, order_index = ?, updated_at = CURRENT_TIMESTAMP
       WHERE id = ? AND board_id = ?
     `);
     
-    const result = updateCard.run(columnId, orderIndex || 0, cardId, boardId);
+    const result = updateCard.run(columnId, newIndex || 0, cardId, boardId);
 
     if (result.changes === 0) {
-      return NextResponse.json({ error: 'Failed to update card' }, { status: 500 });
+      return NextResponse.json({ error: 'Failed to move card' }, { status: 500 });
     }
 
-    return NextResponse.json({ success: true, message: 'Card moved successfully' });
+    // Return the updated card
+    const updatedCard = db.prepare(`
+      SELECT id, title, description, column_id, order_index, created_at, updated_at
+      FROM cards WHERE id = ?
+    `).get(cardId);
+
+    return NextResponse.json(updatedCard);
   } catch (error) {
     console.error('Error moving card:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

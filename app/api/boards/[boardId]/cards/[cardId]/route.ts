@@ -23,7 +23,7 @@ export async function PUT(
     // Update card
     const updateCard = db.prepare(`
       UPDATE cards 
-      SET title = ?, description = ?, updated_at = CURRENT_TIMESTAMP 
+      SET title = ?, description = ?, updated_at = CURRENT_TIMESTAMP
       WHERE id = ? AND board_id = ?
     `);
     
@@ -59,10 +59,10 @@ export async function DELETE(
       return NextResponse.json({ error: 'Card not found' }, { status: 404 });
     }
 
-    // Soft delete the card (set is_deleted = 1)
+    // Soft delete card
     const deleteCard = db.prepare(`
       UPDATE cards 
-      SET is_deleted = 1, updated_at = CURRENT_TIMESTAMP 
+      SET is_deleted = 1, updated_at = CURRENT_TIMESTAMP
       WHERE id = ? AND board_id = ?
     `);
     
@@ -72,7 +72,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'Failed to delete card' }, { status: 500 });
     }
 
-    return NextResponse.json({ success: true, message: 'Card deleted successfully' });
+    return NextResponse.json({ message: 'Card deleted successfully' });
   } catch (error) {
     console.error('Error deleting card:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

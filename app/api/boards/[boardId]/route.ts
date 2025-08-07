@@ -8,56 +8,57 @@ export async function GET(
   try {
     const { boardId } = await params;
 
-    // Get all columns for this board
-    const columnsStmt = db.prepare(`
-      SELECT id, board_id, name as title, order_index as "index"
-      FROM columns 
-      WHERE board_id = ?
-      ORDER BY order_index
-    `);
-    const columns = columnsStmt.all(boardId) as Array<{ id: string; board_id: string; title: string; index: number }>;
-
-    if (!columns.length) {
+    // Get board data
+    const board = db.prepare('SELECT * FROM boards WHERE id = ?').get(boardId) as { id: string; name: string } | undefined;
+    if (!board) {
       return NextResponse.json({ error: 'Board not found' }, { status: 404 });
     }
 
-    // Get all cards for this board
-    const cardsStmt = db.prepare(`
-      SELECT 
-        id,
-        title,
-        description,
-        is_deleted,
-        created_at,
-        updated_at,
-        column_id,
-        board_id
-      FROM cards 
-      WHERE board_id = ? AND is_deleted = 0
-      ORDER BY column_id, order_index
-    `);
-    const cards = cardsStmt.all(boardId) as Array<{
-      id: string;
-      title: string;
-      description: string;
-      is_deleted: number;
-      created_at: string;
-      updated_at: string;
-      column_id: string;
-      board_id: string;
-    }>;
+    // Get columns for this board
+    const columns = db.prepare(`
+      SELECT * FROM columns 
+      WHERE board_id = ? 
+      ORDER BY order_index
+    `).all(boardId) as Array<{ id: string; name: string; order_index: number }>;
 
-    // Group cards by column
-    const boardColumns = columns.map(column => ({
-      title: column.title,
-      index: column.index,
-      cards: cards.filter((card) => card.column_id === column.id)
-    }));
+    // Get cards for each column
+    const boardData = {
+      name: board.name,
+      columns: columns.map((col) => {
+        const cards = db.prepare(`
+          SELECT * FROM cards 
+          WHERE column_id = ? AND is_deleted = 0 
+          ORDER BY order_index
+        `).all(col.id) as Array<{
+          id: string;
+          title: string;
+          description: string;
+          is_deleted: number;
+          created_at: string;
+          updated_at: string;
+          column_id: string;
+          board_id: string;
+        }>;
 
-    return NextResponse.json({
-      name: 'My Kanban Board',
-      columns: boardColumns
-    });
+        return {
+          id: col.id,
+          title: col.name,
+          index: col.order_index,
+          cards: cards.map(card => ({
+            id: card.id,
+            title: card.title,
+            description: card.description,
+            is_deleted: card.is_deleted === 1,
+            created_at: card.created_at,
+            updated_at: card.updated_at,
+            column_id: card.column_id,
+            board_id: card.board_id
+          }))
+        };
+      })
+    };
+
+    return NextResponse.json(boardData);
   } catch (error) {
     console.error('Error fetching board:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
